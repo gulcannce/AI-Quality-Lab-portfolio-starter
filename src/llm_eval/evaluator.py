@@ -1,4 +1,13 @@
 from dataclasses import dataclass
+import re
+
+
+def normalize_text(text: str) -> str:
+    text = text.lower()
+    text = re.sub(r"could not be found", "not found", text)
+    text = re.sub(r"was not found", "not found", text)
+    text = re.sub(r"were not found", "not found", text)
+    return text
 
 
 @dataclass
@@ -21,7 +30,7 @@ def contains_required_terms(
     answer: str,
     required_terms: list[str],
 ) -> EvalResult:
-    answer_lower = answer.lower()
+    answer_lower = normalize_text(answer)
 
     missing = [
         term
@@ -53,7 +62,7 @@ def calculate_quality_report(
     forbidden_terms: list[str],
     reference_facts: list[str],
 ) -> QualityReport:
-    answer_lower = answer.lower()
+    answer_lower = normalize_text(answer)
 
     required_found = sum(
         term.lower() in answer_lower
