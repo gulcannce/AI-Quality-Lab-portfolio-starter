@@ -1,0 +1,97 @@
+{
+  "info": {
+    "name": "AI Quality Lab - API Testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET - Users",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "https://jsonplaceholder.typicode.com/users"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response is a non-empty array\", function () { const response = pm.response.json(); pm.expect(response).to.be.an(\"array\"); pm.expect(response.length).to.be.above(0); });",
+              "pm.test(\"First user contains required fields\", function () { const user = pm.response.json()[0]; [\"id\",\"name\",\"username\",\"email\"].forEach(f => pm.expect(user).to.have.property(f)); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET - User Not Found",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "https://jsonplaceholder.typicode.com/users/9999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Non-existing user returns 404\", function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET - Negative User ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "https://jsonplaceholder.typicode.com/users/-1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Negative user id returns 404\", function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST - Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Gulcan Test\",\n  \"username\": \"gulcan_qa\",\n  \"email\": \"gulcan@example.com\"\n}"
+        },
+        "url": "https://jsonplaceholder.typicode.com/users"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Created user data is correct\", function () { const response = pm.response.json(); pm.expect(response.name).to.eql(\"Gulcan Test\"); pm.expect(response.username).to.eql(\"gulcan_qa\"); pm.expect(response.email).to.eql(\"gulcan@example.com\"); });",
+              "pm.test(\"Created user has an id\", function () { const response = pm.response.json(); pm.expect(response).to.have.property(\"id\"); pm.expect(response.id).to.be.a(\"number\"); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
